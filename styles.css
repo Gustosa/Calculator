@@ -28,9 +28,20 @@ body {
 }
 
 #display-screen {
+    display: flex;
     flex: 1;
     border-radius: 8px;
     background-color: goldenrod;
+}
+
+#display-screen #result {
+    display: inline-block;
+    justify-self: flex-end;
+    align-self: flex-end;
+    flex: 1;
+    text-align: end;
+    margin: 6px;
+    font-size: 48px;
 }
 
 #digits {

@@ -23,6 +23,19 @@ function operate(num1, num2, operator) {
     }
 }
 
+function displayDigit(event) {
+    if (display.innerText == 0) display.innerText = ""
+
+    const digitClicked = event.target.innerText
+    display.innerText += digitClicked
+}
+
 let num1
 let num2
 let operator
+
+const digits = Array.from(document.querySelectorAll(".digit"))
+const display = document.querySelector("#result")
+
+digits.forEach(digit => digit.addEventListener("click", displayDigit))
+
