@@ -42,30 +42,32 @@ function getDigit(event) {
         }
 
     } else if (classes.contains("operator")) {
-        let display = currentDisplay.innerText.split(operator)
-        if (display[1] !== "Real smartie") {
-            let num2Check = display[1]
+        if (currentDisplay.innerText && !operator) {
+            operator = storedDigit
+            currentDisplay.innerText += operator
+        } else {
+            let displayElements = currentDisplay.innerText.split(operator)
 
-            if (num2Check === "") {
-                currentDisplay.innerText = display[0] + storedDigit
-                operator = storedDigit
-            } else {
-                if (num2Check || num2Check == 0) {
-                    num1 = +display[0]
-                    num2 = +display[1]
+            if (displayElements[1] !== "Real smartie") {
+                let num2Check = displayElements[1]
 
-                    if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
-                    else {
-                        num1 = operate(num1, num2, operator)
-                        currentDisplay.innerText = num1
-                        num2 = ""
-                        operator = ""
-                    }
-                }
-
-                if (currentDisplay.innerText && !operator) {
-                    currentDisplay.innerText += storedDigit
+                if (!num2Check) {
                     operator = storedDigit
+                    currentDisplay.innerText = displayElements[0] + operator
+                } else {
+                    if (num2Check || num2Check == 0) {
+                        num1 = +displayElements[0]
+                        num2 = +displayElements[1]
+
+                        if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
+                        else {
+                            num1 = operate(num1, num2, operator)
+                            operator = storedDigit
+                            num2 = ""
+                            currentDisplay.innerText = num1 + operator
+
+                        }
+                    }
                 }
             }
         }
@@ -73,20 +75,36 @@ function getDigit(event) {
     } else if (classes.contains("equals")) {
         if (!currentDisplay.innerText || !operator) currentDisplay.innerText = "Error"
         else {
-            const display = currentDisplay.innerText.split(operator)
+            const displayElements = currentDisplay.innerText.split(operator)
 
-            if (!display[1]) currentDisplay.innerText = "Error"
+            if (!displayElements[1]) currentDisplay.innerText = "Error"
             else {
-                num1 = +display[0]
-                num2 = +display[1]
+                num1 = +displayElements[0]
+                num2 = +displayElements[1]
 
                 if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
                 else {
                     const operation = operate(num1, num2, operator)
                     currentDisplay.innerText = operation
                     num1 = operation
+                    operator = ""
                 }
             }
+        }
+
+    } else if (classes.contains("obliterate")) {
+        currentDisplay.innerText = 0
+        num1 = 0, num2 = "", operator = ""
+
+    } else if (classes.contains("delete")) {
+        displayElements = currentDisplay.innerText.split("")
+        removedElement = displayElements.at(-1)
+        removedElementIndex = displayElements.lastIndexOf(removedElement)
+
+        if (removedElementIndex == 0) currentDisplay.innerText = 0
+        else {
+            currentDisplay.innerText = currentDisplay.innerText.substring(0, removedElementIndex)
+            if (removedElement == operator) operator = ""
         }
     }
 }
