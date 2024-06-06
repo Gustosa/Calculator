@@ -35,37 +35,50 @@ function getDigit(event) {
     const classes = digitClicked.classList
 
     if (classes.contains("number")) {
-        if (currentDisplay.innerText == 0) {
-            currentDisplay.innerText = storedDigit
-        } else {
-            currentDisplay.innerText += storedDigit
+        const displayElements = currentDisplay.innerText.split("")
+
+        if (displayElements.length < 14) {
+            if (currentDisplay.innerText == 0) {
+                currentDisplay.innerText = storedDigit
+            } else {
+                currentDisplay.innerText += storedDigit
+            }
         }
 
     } else if (classes.contains("operator")) {
-        if (currentDisplay.innerText && !operator) {
-            operator = storedDigit
-            currentDisplay.innerText += operator
-        } else {
-            let displayElements = currentDisplay.innerText.split(operator)
+        const displayElements = currentDisplay.innerText.split("")
 
-            if (displayElements[1] !== "Real smartie") {
-                let num2Check = displayElements[1]
+        if (displayElements.length <= 14) {
+            if (currentDisplay.innerText && !operator) {
+                operator = storedDigit
+                currentDisplay.innerText += operator
+            } else {
+                let displayElements = currentDisplay.innerText.split(operator)
 
-                if (!num2Check) {
-                    operator = storedDigit
-                    currentDisplay.innerText = displayElements[0] + operator
-                } else {
-                    if (num2Check || num2Check == 0) {
-                        num1 = +displayElements[0]
-                        num2 = +displayElements[1]
+                if (displayElements[1] !== "Real smartie") {
+                    let num2Check = displayElements[1]
 
-                        if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
-                        else {
-                            num1 = operate(num1, num2, operator)
-                            operator = storedDigit
-                            num2 = ""
-                            currentDisplay.innerText = num1 + operator
+                    if (!num2Check) {
+                        operator = storedDigit
+                        currentDisplay.innerText = displayElements[0] + operator
+                    } else {
+                        if (num2Check || num2Check == 0) {
+                            num1 = +displayElements[0]
+                            num2 = +displayElements[1]
 
+                            if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
+                            else {
+                                num1 = operate(num1, num2, operator).toString()
+                                operator = storedDigit
+                                num2 = ""
+
+                                const num1Check = num1.split("")
+
+                                if (num1Check.length >= 14) {
+                                    num1 = num1Check.substring(0, 14).join("")
+                                    currentDisplay.innerText = num1
+                                } else currentDisplay.innerText = num1 + operator
+                            }
                         }
                     }
                 }
