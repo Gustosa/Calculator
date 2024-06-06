@@ -26,8 +26,8 @@ function operate(num1, num2, operator) {
 function getDigit(event) {
     let currentDisplay = document.querySelector("#result")
 
-    if (currentDisplay.innerText === "Error" || currentDisplay.innerText === "Real smartie") {
-        currentDisplay.innerText = 0, num1 = 0, num2 = "", operator = ""
+    if (currentDisplay.innerText === "Error" || currentDisplay.innerText === "Smart") {
+        currentDisplay.innerText = 0, num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
     }
 
     const digitClicked = event.target
@@ -38,7 +38,17 @@ function getDigit(event) {
         const displayElements = currentDisplay.innerText.split("")
 
         if (displayElements.length < 14) {
-            if (currentDisplay.innerText == 0) {
+            if (classes.contains("dot")) {
+                if (!num1HasDot && !operator) {
+                    num1HasDot = true
+                    currentDisplay.innerText += storedDigit
+                }
+
+                if (!num2HasDot && operator) {
+                    num2HasDot = true
+                    currentDisplay.innerText += storedDigit
+                }
+            } else if (currentDisplay.innerText == 0 && !num1HasDot) {
                 currentDisplay.innerText = storedDigit
             } else {
                 currentDisplay.innerText += storedDigit
@@ -66,16 +76,19 @@ function getDigit(event) {
                             num1 = +displayElements[0]
                             num2 = +displayElements[1]
 
-                            if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
+                            if (num2 == 0 && operator === "/") currentDisplay.innerText = "Smart"
                             else {
-                                num1 = operate(num1, num2, operator).toString()
+                                num1 = operate(num1, num2, operator)
                                 operator = storedDigit
                                 num2 = ""
 
-                                const num1Check = num1.split("")
+                                if (num1 % 1 == 0) num1HasDot = false
+                                num2HasDot = false
+
+                                const num1Check = num1.toString().split("")
 
                                 if (num1Check.length >= 14) {
-                                    num1 = num1Check.substring(0, 14).join("")
+                                    num1 = num1Check.join("").substring(0, 14)
                                     currentDisplay.innerText = num1
                                 } else currentDisplay.innerText = num1 + operator
                             }
@@ -95,19 +108,27 @@ function getDigit(event) {
                 num1 = +displayElements[0]
                 num2 = +displayElements[1]
 
-                if (num2 == 0 && operator === "/") currentDisplay.innerText = "Real smartie"
+                if (num2 == 0 && operator === "/") currentDisplay.innerText = "Smart"
                 else {
                     const operation = operate(num1, num2, operator)
-                    currentDisplay.innerText = operation
                     num1 = operation
                     operator = ""
+                    num2HasDot = false
+                    if (num1 % 1 == 0) num1HasDot = false
+
+                    const num1Check = num1.toString().split("")
+
+                    if (num1Check.length >= 14) {
+                        num1 = num1Check.join("").substring(0, 14)
+                        currentDisplay.innerText = num1
+                    } else currentDisplay.innerText = num1 + operator
                 }
             }
         }
 
     } else if (classes.contains("obliterate")) {
         currentDisplay.innerText = 0
-        num1 = 0, num2 = "", operator = ""
+        num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
 
     } else if (classes.contains("delete")) {
         displayElements = currentDisplay.innerText.split("")
@@ -117,14 +138,19 @@ function getDigit(event) {
         if (removedElementIndex == 0) currentDisplay.innerText = 0
         else {
             currentDisplay.innerText = currentDisplay.innerText.substring(0, removedElementIndex)
+
             if (removedElement == operator) operator = ""
+            if (removedElement == "." && !operator) num1HasDot = false
+            if (removedElement == "." && operator) num2HasDot = false
         }
     }
 }
 
-let num1
+let num1 = 0
 let num2
 let operator
+let num1HasDot = false
+let num2HasDot = false
 
 const digits = Array.from(document.querySelectorAll(".digit"))
 digits.forEach(digit => digit.addEventListener("click", getDigit))
