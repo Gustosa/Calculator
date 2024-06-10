@@ -53,21 +53,17 @@ function operatorClicked(currentDisplay, storedDigit) {
             operator = storedDigit
             currentDisplay.innerText += operator
         } else {
-            const operands = currentDisplay.innerText.split(operator)
+            operandsCheck(currentDisplay)
 
-            if (operands[1] !== "Real smartie") {
-                let num2Check = operands[1]
+            if (!operands[1]) {
+                operator = storedDigit
+                currentDisplay.innerText = operands[0] + operator
+            }
 
-                if (!num2Check) {
-                    operator = storedDigit
-                    currentDisplay.innerText = operands[0] + operator
-                }
-
-                if (num2Check) {
-                    updateOperands(currentDisplay, operands)
-                    operator = storedDigit
-                    overflowCheck(currentDisplay)
-                }
+            if (operands[1]) {
+                updateOperands(currentDisplay, operands)
+                operator = storedDigit
+                overflowCheck(currentDisplay)
             }
         }
     }
@@ -76,7 +72,7 @@ function operatorClicked(currentDisplay, storedDigit) {
 function equalsClicked(currentDisplay) {
     if (!currentDisplay.innerText || !operator) currentDisplay.innerText = "Error"
     else {
-        const operands = currentDisplay.innerText.split(operator)
+        operandsCheck(currentDisplay)
 
         if (!operands[1]) currentDisplay.innerText = "Error"
         else {
@@ -131,6 +127,15 @@ function overflowCheck(currentDisplay) {
     }
 }
 
+function operandsCheck(currentDisplay) {
+    const displayElements = currentDisplay.innerText.split("")
+    const operatorPosition = displayElements.lastIndexOf(operator)
+
+    num1 = displayElements.join("").substring(0, operatorPosition)
+    num2 = displayElements.join("").substring(operatorPosition + 1)
+    operands = [num1, num2]
+}
+
 function updateDisplay(event) {
     let currentDisplay = document.querySelector("#result")
 
@@ -162,6 +167,7 @@ function updateDisplay(event) {
 
 let num1 = 0
 let num2
+let operands
 let operator
 let num1HasDot = false
 let num2HasDot = false
