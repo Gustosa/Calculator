@@ -23,125 +23,139 @@ function operate(num1, num2, operator) {
     }
 }
 
-function getDigit(event) {
+function numberClicked(currentDisplay, storedDigit, isDot) {
+    const displayElements = currentDisplay.innerText.split("")
+
+    if (displayElements.length < 14) {
+        if (isDot) {
+            if (!num1HasDot && !operator) {
+                num1HasDot = true
+                currentDisplay.innerText += storedDigit
+            }
+
+            if (!num2HasDot && operator) {
+                num2HasDot = true
+                currentDisplay.innerText += storedDigit
+            }
+        } else if (currentDisplay.innerText == 0 && !num1HasDot) {
+            currentDisplay.innerText = storedDigit
+        } else {
+            currentDisplay.innerText += storedDigit
+        }
+    }
+}
+
+function operatorClicked(currentDisplay, storedDigit) {
+    const displayElements = currentDisplay.innerText.split("")
+
+    if (displayElements.length <= 14) {
+        if (currentDisplay.innerText && !operator) {
+            operator = storedDigit
+            currentDisplay.innerText += operator
+        } else {
+            const operands = currentDisplay.innerText.split(operator)
+
+            if (operands[1] !== "Real smartie") {
+                let num2Check = operands[1]
+
+                if (!num2Check) {
+                    operator = storedDigit
+                    currentDisplay.innerText = operands[0] + operator
+                }
+
+                if (num2Check) {
+                    updateOperands(currentDisplay, operands)
+                    operator = storedDigit
+                    overflowCheck(currentDisplay)
+                }
+            }
+        }
+    }
+}
+
+function equalsClicked(currentDisplay) {
+    if (!currentDisplay.innerText || !operator) currentDisplay.innerText = "Error"
+    else {
+        const operands = currentDisplay.innerText.split(operator)
+
+        if (!operands[1]) currentDisplay.innerText = "Error"
+        else {
+            updateOperands(currentDisplay, operands)
+            operator = ""
+            overflowCheck(currentDisplay)
+        }
+    }
+}
+
+function obliterateClicked(currentDisplay) {
+    currentDisplay.innerText = 0
+    num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
+}
+
+function deleteClicked(currentDisplay) {
+    displayElements = currentDisplay.innerText.split("")
+
+    removedElement = displayElements.at(-1)
+    removedElementIndex = displayElements.lastIndexOf(removedElement)
+
+    if (removedElementIndex == 0) currentDisplay.innerText = 0
+    else {
+        currentDisplay.innerText = currentDisplay.innerText.substring(0, removedElementIndex)
+
+        if (removedElement === operator) operator = ""
+        if (removedElement === "." && !operator) num1HasDot = false
+        if (removedElement === "." && operator) num2HasDot = false
+    }
+}
+
+function updateOperands(currentDisplay, operands) {
+    num1 = +operands[0]
+    num2 = +operands[1]
+
+    if (num2 == 0 && operator === "/") currentDisplay.innerText = "Smart"
+
+    num1 = operate(num1, num2, operator)
+    num2 = ""
+    if (num1 % 1 == 0) num1HasDot = false
+    num2HasDot = false
+}
+
+function overflowCheck(currentDisplay) {
+    const num1Check = num1.toString().split("")
+
+    if (num1Check.length >= 14) {
+        num1 = num1Check.join("").substring(0, 14)
+        currentDisplay.innerText = num1
+    } else {
+        currentDisplay.innerText = num1 + operator
+    }
+}
+
+function updateDisplay(event) {
     let currentDisplay = document.querySelector("#result")
 
     if (currentDisplay.innerText === "Error" || currentDisplay.innerText === "Smart") {
         currentDisplay.innerText = 0, num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
-    }
+    } else {
+        const classes = event.target.classList
+        const storedDigit = event.target.innerText
 
-    const digitClicked = event.target
-    const storedDigit = digitClicked.innerText
-    const classes = digitClicked.classList
+        if (classes.contains("number")) {
+            let isDot = classes.contains("dot")
 
-    if (classes.contains("number")) {
-        const displayElements = currentDisplay.innerText.split("")
+            numberClicked(currentDisplay, storedDigit, isDot)
 
-        if (displayElements.length < 14) {
-            if (classes.contains("dot")) {
-                if (!num1HasDot && !operator) {
-                    num1HasDot = true
-                    currentDisplay.innerText += storedDigit
-                }
+        } else if (classes.contains("operator")) {
+            operatorClicked(currentDisplay, storedDigit)
 
-                if (!num2HasDot && operator) {
-                    num2HasDot = true
-                    currentDisplay.innerText += storedDigit
-                }
-            } else if (currentDisplay.innerText == 0 && !num1HasDot) {
-                currentDisplay.innerText = storedDigit
-            } else {
-                currentDisplay.innerText += storedDigit
-            }
-        }
+        } else if (classes.contains("equals")) {
+            equalsClicked(currentDisplay)
 
-    } else if (classes.contains("operator")) {
-        const displayElements = currentDisplay.innerText.split("")
+        } else if (classes.contains("obliterate")) {
+            obliterateClicked(currentDisplay)
 
-        if (displayElements.length <= 14) {
-            if (currentDisplay.innerText && !operator) {
-                operator = storedDigit
-                currentDisplay.innerText += operator
-            } else {
-                let displayElements = currentDisplay.innerText.split(operator)
-
-                if (displayElements[1] !== "Real smartie") {
-                    let num2Check = displayElements[1]
-
-                    if (!num2Check) {
-                        operator = storedDigit
-                        currentDisplay.innerText = displayElements[0] + operator
-                    } else {
-                        if (num2Check || num2Check == 0) {
-                            num1 = +displayElements[0]
-                            num2 = +displayElements[1]
-
-                            if (num2 == 0 && operator === "/") currentDisplay.innerText = "Smart"
-                            else {
-                                num1 = operate(num1, num2, operator)
-                                operator = storedDigit
-                                num2 = ""
-
-                                if (num1 % 1 == 0) num1HasDot = false
-                                num2HasDot = false
-
-                                const num1Check = num1.toString().split("")
-
-                                if (num1Check.length >= 14) {
-                                    num1 = num1Check.join("").substring(0, 14)
-                                    currentDisplay.innerText = num1
-                                } else currentDisplay.innerText = num1 + operator
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-    } else if (classes.contains("equals")) {
-        if (!currentDisplay.innerText || !operator) currentDisplay.innerText = "Error"
-        else {
-            const displayElements = currentDisplay.innerText.split(operator)
-
-            if (!displayElements[1]) currentDisplay.innerText = "Error"
-            else {
-                num1 = +displayElements[0]
-                num2 = +displayElements[1]
-
-                if (num2 == 0 && operator === "/") currentDisplay.innerText = "Smart"
-                else {
-                    const operation = operate(num1, num2, operator)
-                    num1 = operation
-                    operator = ""
-                    num2HasDot = false
-                    if (num1 % 1 == 0) num1HasDot = false
-
-                    const num1Check = num1.toString().split("")
-
-                    if (num1Check.length >= 14) {
-                        num1 = num1Check.join("").substring(0, 14)
-                        currentDisplay.innerText = num1
-                    } else currentDisplay.innerText = num1 + operator
-                }
-            }
-        }
-
-    } else if (classes.contains("obliterate")) {
-        currentDisplay.innerText = 0
-        num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
-
-    } else if (classes.contains("delete")) {
-        displayElements = currentDisplay.innerText.split("")
-        removedElement = displayElements.at(-1)
-        removedElementIndex = displayElements.lastIndexOf(removedElement)
-
-        if (removedElementIndex == 0) currentDisplay.innerText = 0
-        else {
-            currentDisplay.innerText = currentDisplay.innerText.substring(0, removedElementIndex)
-
-            if (removedElement == operator) operator = ""
-            if (removedElement == "." && !operator) num1HasDot = false
-            if (removedElement == "." && operator) num2HasDot = false
+        } else if (classes.contains("delete")) {
+            deleteClicked(currentDisplay)
         }
     }
 }
@@ -153,5 +167,5 @@ let num1HasDot = false
 let num2HasDot = false
 
 const digits = Array.from(document.querySelectorAll(".digit"))
-digits.forEach(digit => digit.addEventListener("click", getDigit))
+digits.forEach(digit => digit.addEventListener("click", updateDisplay))
 
