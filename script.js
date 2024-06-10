@@ -23,6 +23,35 @@ function operate(num1, num2, operator) {
     }
 }
 
+function updateDisplay(event) {
+    let currentDisplay = document.querySelector("#result")
+
+    if (currentDisplay.innerText === "Error" || currentDisplay.innerText === "Smart") {
+        currentDisplay.innerText = 0, num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
+    } else {
+        const classes = event.target.classList
+        const storedDigit = event.target.innerText
+
+        if (classes.contains("number")) {
+            let isDot = classes.contains("dot")
+
+            numberClicked(currentDisplay, storedDigit, isDot)
+
+        } else if (classes.contains("operator")) {
+            operatorClicked(currentDisplay, storedDigit)
+
+        } else if (classes.contains("equals")) {
+            equalsClicked(currentDisplay)
+
+        } else if (classes.contains("obliterate")) {
+            obliterateClicked(currentDisplay)
+
+        } else if (classes.contains("delete")) {
+            deleteClicked(currentDisplay)
+        }
+    }
+}
+
 function numberClicked(currentDisplay, storedDigit, isDot) {
     const displayElements = currentDisplay.innerText.split("")
 
@@ -136,31 +165,35 @@ function operandsCheck(currentDisplay) {
     operands = [num1, num2]
 }
 
-function updateDisplay(event) {
+function keyboardSupport(event) {
     let currentDisplay = document.querySelector("#result")
 
     if (currentDisplay.innerText === "Error" || currentDisplay.innerText === "Smart") {
         currentDisplay.innerText = 0, num1 = 0, num2 = "", operator = "", num1HasDot = false, num2HasDot = false
     } else {
-        const classes = event.target.classList
-        const storedDigit = event.target.innerText
+        const keyPressed = event.key
 
-        if (classes.contains("number")) {
-            let isDot = classes.contains("dot")
-
-            numberClicked(currentDisplay, storedDigit, isDot)
-
-        } else if (classes.contains("operator")) {
-            operatorClicked(currentDisplay, storedDigit)
-
-        } else if (classes.contains("equals")) {
-            equalsClicked(currentDisplay)
-
-        } else if (classes.contains("obliterate")) {
-            obliterateClicked(currentDisplay)
-
-        } else if (classes.contains("delete")) {
-            deleteClicked(currentDisplay)
+        switch (keyPressed) {
+            case "0": numberClicked(currentDisplay, keyPressed, false); break
+            case "1": numberClicked(currentDisplay, keyPressed, false); break
+            case "2": numberClicked(currentDisplay, keyPressed, false); break
+            case "3": numberClicked(currentDisplay, keyPressed, false); break
+            case "4": numberClicked(currentDisplay, keyPressed, false); break
+            case "5": numberClicked(currentDisplay, keyPressed, false); break
+            case "6": numberClicked(currentDisplay, keyPressed, false); break
+            case "7": numberClicked(currentDisplay, keyPressed, false); break
+            case "8": numberClicked(currentDisplay, keyPressed, false); break
+            case "9": numberClicked(currentDisplay, keyPressed, false); break
+            case ".": numberClicked(currentDisplay, keyPressed, true); break
+            case "+": operatorClicked(currentDisplay, keyPressed); break
+            case "-": operatorClicked(currentDisplay, keyPressed); break
+            case "*": operatorClicked(currentDisplay, keyPressed); break
+            case "/": operatorClicked(currentDisplay, keyPressed); break
+            case "=": equalsClicked(currentDisplay); break
+            case "Enter": equalsClicked(currentDisplay); break
+            case "Backspace": deleteClicked(currentDisplay); break
+            case "Delete": obliterateClicked(currentDisplay); break
+            default:
         }
     }
 }
@@ -171,6 +204,8 @@ let operands
 let operator
 let num1HasDot = false
 let num2HasDot = false
+
+document.addEventListener("keydown", keyboardSupport)
 
 const digits = Array.from(document.querySelectorAll(".digit"))
 digits.forEach(digit => digit.addEventListener("click", updateDisplay))
